@@ -1,0 +1,44 @@
+#!groovy
+
+node() {
+  currentBuild.result = "SUCCESS"
+
+  print "Starting Jenkins task!"
+
+  try {
+
+    stage('Checkout'){
+      checkout scm
+    }
+
+    stage('Test'){
+
+      print "Start runing tests..."
+    }
+    stage('Deploy') {
+      print "Start deploying..."
+
+    }
+    stage('Cleanup'){
+      echo 'prune and cleanup'
+      if(EMAIL_NOTIFICATIONS) {
+            mail body: "project build successful: ${env.BUILD_URL}",
+            subject: "${env.JOB_NAME}#${env.BUILD_NUMBER} build successful",
+            to: "${EMAIL_NOTIFICATIONS}".trim().replaceAll(~/\n/, ",")
+        }
+    }
+
+  }
+  catch (err) {
+
+    currentBuild.result = "FAILURE"
+
+    if(EMAIL_NOTIFICATIONS) {
+        mail body: "project build error is here: ${env.BUILD_URL}",
+        subject: "${env.JOB_NAME}#${env.BUILD_NUMBER} build failed",
+        to: "${EMAIL_NOTIFICATIONS}".trim().replaceAll(~/\n/, ",")
+    }
+
+    throw err
+  }
+}
