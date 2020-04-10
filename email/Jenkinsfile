@@ -17,6 +17,9 @@ node() {
     }
     stage('Deploy') {
       print "Start deploying..."
+      if (THROW_ERROR.toBoolean()) {
+        throw new Exception("Test Exception")
+      }
 
     }
     stage('Cleanup'){
